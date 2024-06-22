@@ -1,23 +1,13 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import Transactions_Table from "./Components/TransactionsTable";
+import Statistics from "./Components/Statistics";
+import Chart from "./Components/Chart";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1 className=" text-center text-lg font-semibold">Transaction Dashboard</h1>
+      <Transactions_Table />
     </div>
   );
 }
