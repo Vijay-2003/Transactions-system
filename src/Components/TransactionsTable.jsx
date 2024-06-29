@@ -5,7 +5,7 @@ import Chart from "./Chart";
 const TransactionsTable = () => {
   const [transactionData, setTransactionData] = useState([]);
   const [search, setSearch] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState(3); // Default to March (corresponds to 3)
+  const [selectedMonth, setSelectedMonth] = useState(0); // Default to March (corresponds to 3)
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -15,7 +15,9 @@ const TransactionsTable = () => {
   const fetchTransactions = () => {
     const queryParams = `?search=${search}&page=${currentPage}`;
 
-    fetch(`http://localhost:5000/listall${queryParams}`)
+    fetch(
+      `https://transctions-manage-system-3.onrender.com/listall${queryParams}`
+    )
       .then((res) => res.json())
       .then((data) => {
         setTransactionData(data);

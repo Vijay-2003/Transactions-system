@@ -1,100 +1,120 @@
-import React, { useState, useEffect } from "react";
-import { Chart, registerables } from "chart.js";
+class ApexChart extends React.Component {
+  constructor(props) {
+    super(props);
 
-// Register necessary modules
-Chart.register(...registerables);
-
-const ChartComponent = ({ selectedMonth }) => {
-  const [priceRanges, setPriceRanges] = useState([]);
-  const [itemCounts, setItemCounts] = useState([]);
-
-  useEffect(() => {
-    fetchData();
-  }, [selectedMonth]);
-
-  const fetchData = () => {
-    fetch(`http://localhost:5000/getdata/month/${selectedMonth}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const { priceRanges, itemCounts } = calculatePriceRanges(data);
-        setPriceRanges(priceRanges);
-        setItemCounts(itemCounts);
-        renderChart(priceRanges, itemCounts);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  };
-
-  const calculatePriceRanges = (data) => {
-    // Implement your price range calculation logic here
-    // Example logic:
-    // const priceRanges = [23, 23, 23];
-    // const itemCounts = [5, 3, 3, 3, 3];
-    return { priceRanges, itemCounts };
-  };
-
-  const renderChart = (priceRanges, itemCounts) => {
-    const ctx = document.getElementById("myChart");
-    if (ctx) {
-      // Check if a chart instance already exists on this canvas
-      // If yes, destroy it before creating a new one
-      Chart.getChart(ctx)?.destroy();
-    }
-
-    const newChart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: priceRanges,
-        datasets: [
-          {
-            label: "Number of Items",
-            data: itemCounts,
-            backgroundColor: "rgba(255, 159, 64, 0.6)", // Orange color
-            borderColor: "rgba(255, 159, 64, 1)", // Darker orange color
-            borderWidth: 1,
-          },
-        ],
-      },
+    this.state = {
+      series: [
+        {
+          name: "Inflation",
+          data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2],
+        },
+      ],
       options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Number of Items",
-            },
-          },
-          x: {
-            title: {
-              display: true,
-              text: "Price Range",
+        chart: {
+          height: 350,
+          type: "bar",
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 10,
+            dataLabels: {
+              position: "top", // top, center, bottom
             },
           },
         },
-        plugins: {
-          legend: {
-            display: false,
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return val + "%";
+          },
+          offsetY: -20,
+          style: {
+            fontSize: "12px",
+            colors: ["#304758"],
+          },
+        },
+
+        xaxis: {
+          categories: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ],
+          position: "top",
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false,
+          },
+          crosshairs: {
+            fill: {
+              type: "gradient",
+              gradient: {
+                colorFrom: "#D8E3F0",
+                colorTo: "#BED1E6",
+                stops: [0, 100],
+                opacityFrom: 0.4,
+                opacityTo: 0.5,
+              },
+            },
+          },
+          tooltip: {
+            enabled: true,
+          },
+        },
+        yaxis: {
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false,
+          },
+          labels: {
+            show: false,
+            formatter: function (val) {
+              return val + "%";
+            },
+          },
+        },
+        title: {
+          text: "Monthly Inflation in Argentina, 2002",
+          floating: true,
+          offsetY: 330,
+          align: "center",
+          style: {
+            color: "#444",
           },
         },
       },
-    });
+    };
+  }
 
-    // Store the chart instance in state or a variable if needed
-    // This can help manage the chart instance for future updates or destruction
-  };
-
-  return (
-    <div className="bg-gradient-to-r from-orange-200 to-orange-400 p-4 rounded-lg shadow-md mt-5">
-      <h1 className="text-3xl font-bold mb-4 text-orange-800">Chart</h1>
-      <div className="flex justify-center">
-        <canvas
-          id="myChart"
-          className="bg-white rounded-lg shadow-md"
-          width="400"
-          height="400"
-        ></canvas>
+  render() {
+    return (
+      <div>
+        <div id="chart">
+          <ReactApexChart
+            options={this.state.options}
+            series={this.state.series}
+            type="bar"
+            height={350}
+          />
+        </div>
+        <div id="html-dist"></div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
-export default ChartComponent;
+const domContainer = document.querySelector("#app");
+ReactDOM.render(React.createElement(ApexChart), domContainer);
