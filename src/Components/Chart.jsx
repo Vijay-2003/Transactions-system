@@ -1,120 +1,109 @@
-class ApexChart extends React.Component {
-  constructor(props) {
-    super(props);
+import React, { useEffect, useState } from "react";
+import Chart from "react-apexcharts";
 
-    this.state = {
-      series: [
-        {
-          name: "Inflation",
-          data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2],
+const TransactionChart = ({ selectedMonth }) => {
+  const [chartData, setChartData] = useState({
+    options: {
+      chart: {
+        id: "transaction-chart",
+      },
+      xaxis: {
+        categories: [], // Will be populated dynamically
+        labels: {
+          show: true, // Hide x-axis labels
         },
-      ],
-      options: {
-        chart: {
-          height: 350,
-          type: "bar",
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 10,
-            dataLabels: {
-              position: "top", // top, center, bottom
-            },
-          },
-        },
-        dataLabels: {
-          enabled: true,
-          formatter: function (val) {
-            return val + "%";
-          },
-          offsetY: -20,
+      },
+      yaxis: {
+        labels: {
           style: {
-            fontSize: "12px",
-            colors: ["#304758"],
-          },
-        },
-
-        xaxis: {
-          categories: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ],
-          position: "top",
-          axisBorder: {
-            show: false,
-          },
-          axisTicks: {
-            show: false,
-          },
-          crosshairs: {
-            fill: {
-              type: "gradient",
-              gradient: {
-                colorFrom: "#D8E3F0",
-                colorTo: "#BED1E6",
-                stops: [0, 100],
-                opacityFrom: 0.4,
-                opacityTo: 0.5,
-              },
-            },
-          },
-          tooltip: {
-            enabled: true,
-          },
-        },
-        yaxis: {
-          axisBorder: {
-            show: false,
-          },
-          axisTicks: {
-            show: false,
-          },
-          labels: {
-            show: false,
-            formatter: function (val) {
-              return val + "%";
-            },
-          },
-        },
-        title: {
-          text: "Monthly Inflation in Argentina, 2002",
-          floating: true,
-          offsetY: 330,
-          align: "center",
-          style: {
-            color: "#444",
+            colors: "#fff", // Adjust the color as needed
           },
         },
       },
-    };
-  }
+      grid: {
+        show: true, // Hide the grid
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "50%",
+          endingShape: "rounded",
+        },
+      },
+      dataLabels: {
+        enabled: true, // Disable data labels on bars
+      },
+      tooltip: {
+        theme: "dark", // Adjust the tooltip theme as needed
+      },
+      fill: {
+        opacity: 1,
+      },
+      colors: ["#FF5733", "#C70039"], // Customize the colors of bars
+    },
+    series: [
+      {
+        name: "Price",
+        data: [], // Will be populated dynamically
+      },
+      {
+        name: "Sold",
+        data: [], // Will be populated dynamically
+      },
+    ],
+  });
 
-  render() {
-    return (
-      <div>
-        <div id="chart">
-          <ReactApexChart
-            options={this.state.options}
-            series={this.state.series}
-            type="bar"
-            height={350}
-          />
-        </div>
-        <div id="html-dist"></div>
+  useEffect(() => {
+    fetchChartData(selectedMonth);
+  }, [selectedMonth]);
+
+  const fetchChartData = (month) => {
+    fetch(
+      `https://transctions-manage-system-3.onrender.com/getdata/month/${month}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const categories = data.map((item) => item.title);
+        const prices = data.map((item) => item.price);
+        const soldItems = data.map((item) => (item.sold ? 1 : 0));
+
+        setChartData({
+          options: {
+            ...chartData.options,
+            xaxis: {
+              categories: categories,
+              labels: {
+                show: false, // Hide x-axis labels
+              },
+            },
+          },
+          series: [
+            {
+              name: "Price",
+              data: prices,
+            },
+            {
+              name: "Sold",
+              data: soldItems,
+            },
+          ],
+        });
+      })
+      .catch((error) => console.error("Error fetching chart data:", error));
+  };
+
+  return (
+    <div className="flex justify-center items-center">
+      <div className="mixed-chart">
+        <Chart
+          options={chartData.options}
+          series={chartData.series}
+          type="bar"
+          width="600"
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-const domContainer = document.querySelector("#app");
-ReactDOM.render(React.createElement(ApexChart), domContainer);
+export default TransactionChart;

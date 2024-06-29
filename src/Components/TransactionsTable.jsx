@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Statistics from "./Statistics";
-import Chart from "./Chart";
+import TransactionChart from "./Chart";
 
 const TransactionsTable = () => {
   const [transactionData, setTransactionData] = useState([]);
@@ -165,7 +165,7 @@ const TransactionsTable = () => {
       </div>
 
       <Statistics selectedMonth={selectedMonth} />
-      <Chart selectedMonth={selectedMonth} />
+      <TransactionChart selectedMonth={selectedMonth} />
     </div>
   );
 };
